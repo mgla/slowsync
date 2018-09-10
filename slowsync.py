@@ -8,9 +8,9 @@ logging.basicConfig(level = os.getenv('LOG_LEVEL', 'DEBUG').strip().upper())
 LOG = logging.getLogger(__name__)
 
 _RCLONE_SOURCE = '/mnt/movies'
-_RCLONE_TARGET = 'rclone-test'
+_RCLONE_TARGET = os.getenv('RCLONE_TARGET', 'rclone-test')
 
-_RCLONE_BINARY = '/home/glatki/dev/slowsync/rclone-v1.42-linux-amd64/rclone'
+_RCLONE_BINARY = os.getenv('RCLONE_BINARY', '/usr/bin/rclone')
 
 def _rclone_command(command):
     LOG.debug('Run command: %s %s', _RCLONE_BINARY, command)
@@ -25,7 +25,7 @@ def _get_rel_path(root_dir, full_dir, file_name):
 
 def _upload_item(item):
     LOG.info('Upload item: ' , item)
-    _rclone_command('copy --dry-run %s')
+    print(_rclone_command('copy --dry-run %s'))
 
 
 def read_local():
@@ -48,7 +48,7 @@ def read_remote():
 
 def main():
     LOG.info('Read local files from %s', _RCLONE_SOURCE)
-    #local_files = read_local()
+    local_files = read_local()
     LOG.info('Read remote files from %s', _RCLONE_TARGET)
     remote_files = read_remote()
 
