@@ -3,6 +3,7 @@
 import subprocess
 import logging
 import os
+import sys
 
 logging.basicConfig(level = os.getenv('LOG_LEVEL', 'DEBUG').strip().upper())
 LOG = logging.getLogger(__name__)
@@ -14,7 +15,13 @@ _RCLONE_BINARY = os.getenv('RCLONE_BINARY', '/usr/bin/rclone')
 
 def _rclone_command(command):
     LOG.debug('Run command: %s %s', _RCLONE_BINARY, command)
-    p = subprocess.run([_RCLONE_BINARY] + command, capture_output = True)
+    try:
+        p = subprocess.run([_RCLONE_BINARY] + command, capture_output = True)
+        p.check_returncode()
+    except subprocess.CalledProcessError:
+        LOG.exception(p.stderr)
+        sys.exit(1)
+
     return p.stdout.decode()
 
 def _get_rel_path(root_dir, full_dir, file_name):
